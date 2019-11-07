@@ -1,0 +1,46 @@
+
+#define HWREGL(addr)	(*((volatile unsigned int *) (addr)))
+#define HWREG(addr)	(*((volatile unsigned short *) (addr)))
+#define HWREGB(addr)	(*((volatile unsigned char *) (addr)))
+
+
+
+#define COMM_COMMAND_PORT	0x03F7FE
+#define COMM_RESULT_PORT	0x03F7FC
+#define COMM_MAGIC_PORT		0x03F7FA
+#define COMM_ID1		0x03F7F8
+#define COMM_ID2		0x03F7F6
+#define COMM_RAM		0x03F800
+
+
+#define OPEN_COMMANDS()		HWREG(COMM_MAGIC_PORT) = 0xCD54
+#define CLOSE_COMMANDS()	HWREG(COMM_MAGIC_PORT) = 0x0000
+#define SEND_COMMAND(__command__, __data__)  HWREG(COMM_COMMAND_PORT) = ((__command__)<<8)|(__data__)
+#define WAIT_COMMAND_END()	while(HWREGB(COMM_COMMAND_PORT) != 0 && HWREGB(COMM_COMMAND_PORT) != 0xFF)
+#define GET_RESPONSE()		HWREGB(COMM_RESULT_PORT)
+//#define SEND_RAM_COMMAND(__command__, __data__) 
+#define WAIT_RAM_COMMAND_END()	{ int nn = 0; while(HWREGB(COMM_ID1) == 'T' && HWREGB(COMM_ID1 + 1) == 'E' && HWREGB(COMM_ID2) == 'R' && HWREGB(COMM_ID2 + 1) == 'A') { ++nn; if(nn > 10) break; }  }\
+								while(1) {  if(HWREGB(COMM_ID1) != 'T' || HWREGB(COMM_ID1 + 1) != 'E' || HWREGB(COMM_ID2) != 'R' || HWREGB(COMM_ID2 + 1) != 'A') continue; \
+									OPEN_COMMANDS(); \
+									if(HWREGB(COMM_COMMAND_PORT) != 0 && HWREGB(COMM_COMMAND_PORT) != 0xFF) continue; \
+									if(HWREGB(COMM_ID1) != 'T' || HWREGB(COMM_ID1 + 1) != 'E' || HWREGB(COMM_ID2) != 'R' || HWREGB(COMM_ID2 + 1) != 'A') continue; \
+									break; }
+
+
+enum MCU_Commands {
+	MCU_CONTROL_IDLE = 0x00,
+
+	MCU_USER_COMMAND_GETVERSION = 0x10, MCU_USER_COMMAND_PLAYTRACK = 0x11, MCU_USER_COMMAND_PLAYTRACKLOOP = 0x12, MCU_USER_COMMAND_PAUSE = 0x13, MCU_USER_COMMAND_RESUME = 0x14,
+	MCU_USER_COMMAND_VOLUME = 0x15, MCU_USER_COMMAND_STATUS = 0x16,
+
+	MCU_CONTROL_COMMAND_LOADDIR = 0x82, MCU_CONTROL_COMMAND_LOADGAME = 0x83, MCU_CONTROL_COMMAND_CHANGEDIR = 0x84, MCU_CONTROL_COMMAND_VERIFYGAME = 0x85,
+	MCU_CONTROL_COMMAND_GETLASTNAME = 0x87, MCU_CONTROL_BOOTSTRAP_LOADLASTGAME = 0x89,
+};
+
+
+
+#define GAMESTARTADDRESS	0x20000
+#define SCREENSHOTSTARTADDRESS	0x200000
+
+#define SOUNDREGISTERS	0x030001
+#define SOUNDDATASTART	0x032001
