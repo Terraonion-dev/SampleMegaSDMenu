@@ -6,7 +6,7 @@ This is a very simple menu for the MegaSD to showcase the ability to run custom 
 
 ## Using replacement menus
 
-In order to make MegaSD load the replacement menu, it must be copied to the root of the SD card and named **menu.msd**. 
+In order to make MegaSD load the replacement menu, the built file must be copied to the root of the SD card and named **menu.msd**. 
 
 MegaSD will always boot its own menu first, show the splash and verify if there is a firmware update. The firmware update process is handled by the internal menu. 
 After the splash, and if no firmware update was present, MegaSD will check if the *menu.msd* file is present on the sd card root, and if it is, it will be loaded and booted from the reset vector again.
@@ -14,6 +14,10 @@ After the splash, and if no firmware update was present, MegaSD will check if th
 Holding *START* while booting past the splash menu will skip the custom menu loading, and will boot to the default MegaSD menu.
 
 ## Development info
+
+To build this sample menu you need SGDK downloaded, and its path set in mk.bat. Then just run mk.bat to have a menu.msd file that you can copy to the sd card root to use as replacement.
+
+Menu.msd file must be 128KB (131072), otherwise MegaSD may refuse to load it.
 
 It's highly recommended to reinitialize the VDP in your own code.
 
